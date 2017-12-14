@@ -8,15 +8,14 @@ $text = htmlspecialchars($_POST['text']);
 // expect -c 'spawn ssh root@172.17.0.4 "echo succesfull > /testssh"; expect "assword:"; send "f416ss\r"; interact'
 
 
-//$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' "echo succesfull > /testssh";' . 
+//$comma = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' "echo succesfull > /testssh";' . 
 //				' expect "assword:"; send "' . $ssh_password . '\r"' .
 //				"; interact'");
 
-$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' " $text "' .;' . 
+$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' "' . $text  . '"' . ';'  .  
 				' expect "assword:"; send "' . $ssh_password . '\r"' .
 				"; interact'");
 echo $command;
-echo $test;
 exec($command);
 #exec($test);
 

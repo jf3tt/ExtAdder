@@ -1,2 +1,4 @@
-cats.php
+src/cats.php
 *.swp
+*.swo
+*.conf
