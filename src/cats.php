@@ -3,7 +3,7 @@
 // CONNECTING TO MYSQL
 $mysql_host = "127.0.0.1:3306";
 $mysql_user = "jangofett";
-$mysql_password = "f416ss";
+$mysql_password = "";
 $mysql_db = "phpmonkey";
 
 $conn = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
