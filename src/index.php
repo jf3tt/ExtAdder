@@ -1,3 +1,17 @@
+<?php
+
+$mysql_host = "172.17.0.3";
+$mysql_user = "root";
+$mysql_password = "f416ss";
+$mysql_db = "asterisk";
+
+$conn = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
+$query = "SELECT HostName from Hosts;";
+$host_elem = mysqli_query($conn, $query);
+
+
+?>
+
 <!DOCTYPE html>
 <html>
    <head>
@@ -12,13 +26,14 @@
  				<p>Display Name: <input type="text" name="name" /></p>
  				<p>Outbound CID: <input type="text" name="cid" /></p>
  				<p>Secret: <input type="password" name="password" /></p>
+				<select name="hostmenu">
+					<?php
+						while ($row = $host_elem->fetch_assoc()){
+							echo "<option>" . $row['HostName'] . "</option>";
+						}
+					?>
+				</select>
  				<p><input type="submit" /></p>
 			</form>
-	 <script>
-	 		<?php 
-			$name = htmlspecialchars($_POST['name']);
-			echo "$name";
-			?>
-	 </script>
    </body>
 </html>

@@ -1,5 +1,15 @@
 <?php 
 
+$mysql_host = "172.17.0.3";
+$mysql_user = "root";
+$mysql_password = "f416ss";
+$mysql_db = "asterisk";
+
+$conn = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
+
+if ($conn->connect_error) {
+	die("Connection failed: " . $conn->connect_error);
+				}
 // get data from html form 
 
 $extension = htmlspecialchars($_POST['extension']);
@@ -31,7 +41,7 @@ exec("echo -n [" . $extension . "]'\n'" .
 	"rewrite_contact=yes'\n'" . 
 	"force_rport=yes'\n'" .
 	"'\n'" .
-	" >> /home/jangofett/Coding/phpmonkey/asterisk/src/config/pjsip.endpoint.conf");
+	" >> /etc/asterisk/pjsip.endpoint.conf");
 
 // adding variables to pjsip.aor.conf
 exec("echo -n [" . $extension . "]'\n'" .
@@ -42,7 +52,7 @@ exec("echo -n [" . $extension . "]'\n'" .
 	"minimum_expiration=60'\n'" . 
 	"qualify_frequency=60'\n'" .
 	"'\n'" .
-	" >> /home/jangofett/Coding/phpmonkey/asterisk/src/config/pjsip.aor.conf");
+	" >> /etc/asterisk/pjsip.aor.conf");
 
 // adding variables to pjsip.auth.conf
 exec("echo -n [" . $extension . "]'\n'" .
@@ -51,38 +61,40 @@ exec("echo -n [" . $extension . "]'\n'" .
 	"password=" . $password . "'\n'" . 
 	"username=" . $extension . "'\n'" .
 	"'\n'" .
-	" >> /home/jangofett/Coding/phpmonkey/asterisk/src/config/pjsip.auth.conf");
+	" >> /etc/asterisk/pjsip.auth.conf");
 
-// adding variables to pjsip.identify.conf
-exec("echo -n [" . $extension . "-identify]'\n'" .
-	"type=identify'\n'" .
-	"endpoint=" . $extension . "'\n'" .
-	"'\n'" .
-	" >> /home/jangofett/Coding/phpmonkey/asterisk/src/config/pjsip.identify.conf");
+// Adding variables to pjsip.identify.conf
+$gen_identify = ("echo -n " .  $extension . "-identify"  .
+	"type=identify" .
+	"endpoint=" . $extension .
+	"" .
+	" >> /etc/asterisk/pjsip.identify.conf");
+
 
 // TODO 
 // extensions_additional.conf
-
-
-
 // Add configs to freepbx host
-$ip = htmlspecialchars($_POST['ip']);
-$ssh_user = htmlspecialchars($_POST['ssh_user']);
-$ssh_password = htmlspecialchars($_POST['ssh_password']);
-$text = htmlspecialchars($_POST['text']);
-//EXAMPLE
-// expect -c 'spawn ssh root@172.17.0.4 "echo succesfull > /testssh"; expect "assword:"; send "f416ss\r"; interact'
 
+$host = htmlspecialchars($_POST['hostmenu']);
 
-//$comma = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' "echo succesfull > /testssh";' . 
-//				' expect "assword:"; send "' . $ssh_password . '\r"' .
-//				"; interact'");
-
-$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $ip . ' "' . $text  . '"' . ';'  .  
+$ipquery = "SELECT * FROM Hosts WHERE HostName='$host';";
+$result = $conn->query($ipquery);
+if ($result->num_rows > 0) {
+		while ($row = $result->fetch_assoc()) {
+			$hostip = "{$row["HostIP"]}";
+			$ssh_user = "{$row["HostUser"]}";
+			$ssh_password = "{$row["HostPass"]}";
+			echo $ssh_password;
+		} 
+} else {
+				echo "Not found";
+}
+echo "Selected IP: " . $hostip . "</br>";
+echo "SSH User: " . $ssh_user . "</br>";
+$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $hostip . ' "' . $gen_identify  . '"' . ';'  .  
 				' expect "assword:"; send "' . $ssh_password . '\r"' .
 				"; interact'");
-echo $command;
 exec($command);
-#exec($test);
+echo $command;
 
 ?>
