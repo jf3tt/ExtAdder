@@ -16,10 +16,6 @@ $extension = htmlspecialchars($_POST['extension']);
 $name = htmlspecialchars($_POST['name']);
 $cid = htmlspecialchars($_POST['cid']);
 $password = htmlspecialchars($_POST['password']);
-echo $extension . "</br>";
-echo $name . "</br>";
-echo $cid . "</br>";
-echo $password . "</br>";
 
 // adding variables to pjsip.endpoint.conf
 exec("echo -n [" . $extension . "]'\n'" .
@@ -64,12 +60,18 @@ exec("echo -n [" . $extension . "]'\n'" .
 	" >> /etc/asterisk/pjsip.auth.conf");
 
 // Adding variables to pjsip.identify.conf
-$gen_identify = ("echo -n " .  $extension . "-identify"  .
-	"type=identify" .
-	"endpoint=" . $extension .
-	"" .
-	" >> /etc/asterisk/pjsip.identify.conf");
+$identify = '\[' .  $extension . '-identify\]!' .
+	'type=identify!' . "" .
+	'endpoint=' . $extension . '!';
+$identify_path =	("/etc/asterisk/pjsip.identify.conf");
 
+echo "identify: " . $identify . "</br>";
+
+function gen_file($cmd, $file_path) {
+		echo "cmd: " . $cmd . "</br>";
+		$sed = ("sed -i 's/!/Z/g' ");
+		return "echo " . "$cmd" .  " >> " . "$file_path" . " && " . "$sed" . " $file_path";
+}
 
 // TODO 
 // extensions_additional.conf
@@ -84,17 +86,15 @@ if ($result->num_rows > 0) {
 			$hostip = "{$row["HostIP"]}";
 			$ssh_user = "{$row["HostUser"]}";
 			$ssh_password = "{$row["HostPass"]}";
-			echo $ssh_password;
 		} 
 } else {
-				echo "Not found";
+		echo "Not found";
 }
 echo "Selected IP: " . $hostip . "</br>";
-echo "SSH User: " . $ssh_user . "</br>";
-$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $hostip . ' "' . $gen_identify  . '"' . ';'  .  
-				' expect "assword:"; send "' . $ssh_password . '\r"' .
-				"; interact'");
+
+$command = ("expect -c"  . " 'spawn ssh " . $ssh_user . "@" . $hostip . ' "' . gen_file($identify, $identify_path)  . " && " . "sleep 0.5" . '"' . ';'  .  
+				' expect "assword:"; send "' . $ssh_password . '\r"' . "; interact'");
+
 exec($command);
 echo $command;
-
 ?>
