@@ -24,7 +24,7 @@ $text = htmlspecialchars($_POST['text']);
 #exec($command);
 
 // CONNECTING TO MYSQL
-$mysql_host = "172.17.0.3";
+$mysql_host = "172.17.0.2";
 $mysql_user = "root";
 $mysql_password = "f416ss";
 $mysql_db = "asterisk";
@@ -38,7 +38,7 @@ if ($conn->connect_error) {
 
 $insert = "INSERT INTO Hosts (HostName, HostIP, HostPort, HostUser, HostPass) VALUES ('$hostname','$ip', 22, '$ssh_user', '$ssh_password')"; 
 
-if ($conn->query($insert) === TRUE) {
+if ($conn->query($insert)=== TRUE) {
 				echo "New record added </br>";
 				echo "<a href=\"/\">Add extension</a>";
 } else {

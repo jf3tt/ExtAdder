@@ -1,6 +1,6 @@
 <?php
 
-$mysql_host = "172.17.0.3";
+$mysql_host = "172.17.0.2";
 $mysql_user = "root";
 $mysql_password = "f416ss";
 $mysql_db = "asterisk";
